@@ -9,26 +9,5 @@ Fileflow is a production-grade File Intelligence Platform. It combines real-time
 - **Backend**: FastAPI, SQLAlchemy, PostgreSQL, pgvector.
 - **AI/ML**: sentence-transformers, scikit-learn.
 
-### Getting Started
 
-1. Set up Docker for PostgreSQL and Redis:
-   ```bash
-   docker-compose up -d
-   ```
-2. Start the backend:
-   ```bash
-   cd apps/api
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   uvicorn src.main:app --reload
-   ```
-3. Start the frontend:
-   ```bash
-   cd apps/web
-   npm install
-   npm run dev
-   ```
-
-### UI Designs
-UI mockups and dashboards generated via Google Stitch MCP are documented in the architecture folder.
+  
