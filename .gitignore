@@ -1,0 +1,20 @@
+# Python
+venv/
+*.pyc
+__pycache__/
+.env
+
+# NextJS / NodeJS
+node_modules/
+.next/
+out/
+build/
+.vercel
+
+# Databases
+postgres_data/
+redis_data/
+
+# OS-specific
+.DS_Store
+Thumbs.db
