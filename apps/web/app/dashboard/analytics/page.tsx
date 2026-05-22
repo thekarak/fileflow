@@ -1,0 +1,90 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { TrendingUp, Activity, Database, FileText, Image as ImageIcon, FileCode, Archive } from "lucide-react"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+
+const CATEGORY_COLORS: Record<string, string> = {
+  documents: "bg-blue-500",
+  images: "bg-emerald-500",
+  code: "bg-indigo-500",
+  archives: "bg-yellow-500",
+  audio: "bg-pink-500",
+  video: "bg-red-500",
+  other: "bg-text-secondary",
+}
+
+export default function AnalyticsPage() {
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/v1/files/stats`)
+      .then(r => r.json())
+      .then(setStats)
+      .catch(() => {})
+  }, [])
+
+  const categories = stats?.categories || {}
+  const total = Object.values(categories).reduce((a: any, b: any) => a + b, 0) as number
+
+  return (
+    <div className="space-y-8 max-w-5xl mx-auto pb-12">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-text-primary">Analytics</h1>
+        <p className="text-sm text-text-secondary mt-1">Insights into your file workspace.</p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Org Score", value: `${stats?.org_score ?? 100}%`, icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+          { label: "Files Organized", value: stats?.files_organized ?? 0, icon: FileText, color: "text-accent-blue", bg: "bg-accent-blue/10" },
+          { label: "Categories", value: Object.keys(categories).length, icon: Activity, color: "text-accent-violet", bg: "bg-accent-violet/10" },
+          { label: "Data Processed", value: stats ? `${(stats.total_bytes / 1024 / 1024).toFixed(1)} MB` : "0 MB", icon: Database, color: "text-orange-500", bg: "bg-orange-500/10" },
+        ].map(({ label, value, icon: Icon, color, bg }) => (
+          <div key={label} className="bg-glass-bg border border-border-custom rounded-2xl p-5">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-xs text-text-secondary font-medium">{label}</span>
+              <div className={`w-7 h-7 rounded-full ${bg} flex items-center justify-center`}>
+                <Icon className={`w-4 h-4 ${color}`} />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-text-primary">{value}</div>
+          </div>
+        ))}
+      </div>
+
+      {total > 0 && (
+        <div className="bg-glass-bg border border-border-custom rounded-2xl p-6">
+          <h2 className="text-sm font-semibold text-text-primary mb-6">File Categories</h2>
+          <div className="space-y-4">
+            {Object.entries(categories).map(([cat, count]: any) => (
+              <div key={cat} className="space-y-1.5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-primary capitalize font-medium">{cat}</span>
+                  <span className="text-text-secondary">{count} files ({Math.round(count / total * 100)}%)</span>
+                </div>
+                <div className="w-full h-2 bg-bg-primary rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ${CATEGORY_COLORS[cat.toLowerCase()] || "bg-accent-blue"}`}
+                    style={{ width: `${(count / total) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {total === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-bg-surface border border-border-custom flex items-center justify-center text-text-secondary/40">
+            <Activity className="w-8 h-8" />
+          </div>
+          <h3 className="font-semibold text-text-primary">No data yet</h3>
+          <p className="text-sm text-text-secondary">Upload files from the Dashboard to see analytics here.</p>
+        </div>
+      )}
+    </div>
+  )
+}

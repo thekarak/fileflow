@@ -36,7 +36,7 @@ export function Sidebar() {
   ]
 
   return (
-    <aside className="w-64 h-screen bg-bg-surface border-r border-border-custom flex flex-col hidden md:flex fixed left-0 top-0 z-40">
+    <aside className="w-64 h-screen bg-bg-surface border-r border-border-custom flex-col hidden md:flex fixed left-0 top-0 z-40">
       <div className="h-16 flex items-center px-6 border-b border-border-custom">
         <Link href="/" className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-blue to-accent-violet flex items-center justify-center text-white font-bold text-sm">
