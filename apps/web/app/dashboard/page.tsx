@@ -63,23 +63,30 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
+    <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col relative overflow-hidden">
+      {/* Background Orbs */}
+      <div className="orb orb-1 -top-40 -left-40 opacity-45 dark:opacity-30 pointer-events-none" />
+      <div className="orb orb-2 top-1/2 -right-40 opacity-35 dark:opacity-25 pointer-events-none" />
+      <div className="orb orb-3 -bottom-40 left-1/3 opacity-30 dark:opacity-20 pointer-events-none" />
+
       <NavBar />
-      <main className="flex-1 container mx-auto p-6 lg:p-10 space-y-8 max-w-6xl">
+      <main className="flex-1 container mx-auto p-6 lg:p-10 space-y-8 max-w-6xl relative z-10">
         <div className="flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Good morning, User</h1>
-            <p className="text-zinc-500 dark:text-zinc-400 mt-1">Here is your file organization overview.</p>
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-text-primary">
+              Good morning, <span className="font-serif italic font-normal text-accent-violet">User</span>
+            </h1>
+            <p className="text-text-secondary mt-1">Here is your file organization overview.</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Storage Donut Chart Mockup */}
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-zinc-100 dark:border-zinc-800 flex flex-col items-center justify-center space-y-4">
-            <div className="w-32 h-32 rounded-full border-[12px] border-blue-600 border-r-zinc-100 dark:border-r-zinc-800 flex items-center justify-center">
-              <span className="text-xl font-bold">1.2 TB</span>
+          <div className="bg-card-bg/50 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-border-custom flex flex-col items-center justify-center space-y-4">
+            <div className="w-32 h-32 rounded-full border-[12px] border-accent-blue border-r-border-custom flex items-center justify-center shadow-inner relative">
+              <span className="text-xl font-mono font-bold text-text-primary">1.2 TB</span>
             </div>
-            <p className="text-sm font-medium text-zinc-500">Storage Used (60%)</p>
+            <p className="text-sm font-medium text-text-secondary">Storage Used (60%)</p>
           </div>
 
           {/* Inbox Dropzone */}
@@ -88,10 +95,10 @@ export default function Dashboard() {
             onDragLeave={() => setIsDragging(false)}
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`md:col-span-2 rounded-2xl p-8 border-2 border-dashed flex flex-col items-center justify-center text-center cursor-pointer transition-colors
+            className={`md:col-span-2 rounded-2xl p-8 border-2 border-dashed flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300 group
               ${isDragging 
-                ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-500' 
-                : 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-300 dark:border-blue-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                ? 'bg-accent-blue/10 border-accent-blue shadow-[0_0_20px_rgba(74,140,255,0.15)] scale-[1.01]' 
+                : 'bg-card-bg/40 backdrop-blur-md border-accent-blue/20 dark:border-accent-blue/10 hover:border-accent-blue/40 hover:bg-card-bg/60 shadow-sm'
               }
               ${!isUploading && !isDragging ? 'animate-pulse-slow' : ''}
             `}
@@ -102,39 +109,39 @@ export default function Dashboard() {
               ref={fileInputRef} 
               onChange={onFileSelect} 
             />
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-accent-blue/10 dark:bg-accent-blue/20 text-accent-blue rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
               <UploadCloud className={`w-8 h-8 ${isUploading ? 'animate-bounce' : ''}`} />
             </div>
-            <h3 className="text-xl font-semibold text-blue-900 dark:text-blue-100">
+            <h3 className="text-xl font-semibold text-text-primary">
               {isUploading ? "Uploading..." : "Inbox Dropzone"}
             </h3>
-            <p className="text-blue-600/80 dark:text-blue-300 mt-2 max-w-sm mx-auto">
+            <p className="text-text-secondary mt-2 max-w-sm mx-auto text-sm">
               {isDragging ? "Drop the file to upload!" : "Drag and drop your messy files here, or click to browse. Fileflow AI will instantly categorize and organize them."}
             </p>
           </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 overflow-hidden">
-          <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800">
-            <h2 className="text-lg font-semibold">Recent Activity</h2>
+        <div className="bg-card-bg/50 backdrop-blur-md rounded-2xl shadow-sm border border-border-custom overflow-hidden">
+          <div className="px-6 py-5 border-b border-border-custom">
+            <h2 className="text-lg font-semibold text-text-primary">Recent Activity</h2>
           </div>
-          <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <div className="divide-y divide-border-custom">
             {activities.length === 0 ? (
-              <div className="px-6 py-8 text-center text-zinc-500">No recent activity. Upload a file to get started!</div>
+              <div className="px-6 py-8 text-center text-text-secondary">No recent activity. Upload a file to get started!</div>
             ) : (
               activities.map((activity, i) => (
-                <div key={i} className="flex items-center justify-between px-6 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <div key={i} className="flex items-center justify-between px-6 py-4 hover:bg-bg-primary/30 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center">
                       <CheckCircle2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{activity.file}</p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{activity.action}</p>
+                      <p className="text-sm font-medium text-text-primary font-mono">{activity.file}</p>
+                      <p className="text-xs text-text-secondary">{activity.action}</p>
                     </div>
                   </div>
-                  <span className="text-xs text-zinc-400">{activity.time}</span>
+                  <span className="text-xs text-text-secondary/70 font-mono">{activity.time}</span>
                 </div>
               ))
             )}
