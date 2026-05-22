@@ -1,9 +1,9 @@
-﻿alembic==1.18.4
+alembic==1.18.4
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.13.0
 argcomplete==3.6.3
-audioop-lts==0.2.2
+audioop-lts==0.2.2; python_version >= '3.13'
 Authlib==1.7.2
 beautifulsoup4==4.13.5
 certifi==2026.4.22
@@ -98,8 +98,8 @@ six==1.17.0
 soupsieve==2.8.3
 SpeechRecognition==3.16.1
 SQLAlchemy==2.0.49
-standard-aifc==3.13.0
-standard-chunk==3.13.0
+standard-aifc==3.13.0; python_version >= '3.13'
+standard-chunk==3.13.0; python_version >= '3.13'
 starlette==1.0.0
 sympy==1.14.0
 textract==2.0.0
@@ -116,6 +116,6 @@ tzlocal==5.3.1
 uritemplate==4.2.0
 urllib3==2.7.0
 uvicorn==0.47.0
-win_unicode_console==0.5
+win_unicode_console==0.5; sys_platform == 'win32'
 xlrd==1.2.0
 xlsxwriter==3.2.9
