@@ -134,13 +134,7 @@ export default function Home() {
               Get Started Free
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <a
-              href="#demo"
-              className="inline-flex items-center gap-2 bg-transparent hover:bg-bg-surface text-text-primary border border-border-custom hover:border-text-secondary font-semibold px-8 py-3.5 rounded-full text-base transition-all"
-            >
-              <Play className="w-4 h-4 fill-current text-accent-blue" />
-              Watch Demo
-            </a>
+
           </div>
 
           <div className="flex items-center justify-center gap-3 pt-6 text-sm text-text-secondary">
@@ -461,27 +455,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Demo Section */}
-      <section id="demo" className="py-24 px-6 relative text-center">
-        <div className="orb orb-2 w-[700px] h-[500px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30 dark:opacity-20" />
-        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-text-primary">
-            See FileFlow in Action.
-          </h2>
-          <p className="text-text-secondary max-w-lg mx-auto">
-            Watch 200 chaotic files become a perfect structure in under 10 seconds.
-          </p>
-
-          <div className="relative rounded-2xl overflow-hidden border border-border-custom bg-card-bg aspect-video shadow-2xl max-w-3xl mx-auto group cursor-pointer hover:scale-[1.01] transition-all duration-300">
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
-              <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg shadow-black/20 group-hover:scale-110 transition-all duration-300 group-hover:shadow-[0_0_50px_rgba(0,85,255,0.2)]">
-                <Play className="w-7 h-7 text-accent-blue fill-current ml-1" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Bento Grid Section */}
       <section className="py-24 px-6 relative z-10 border-t border-border-custom">
@@ -610,149 +583,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-24 px-6 relative z-10 bg-bg-surface/50 border-t border-border-custom">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-xl mx-auto space-y-3 mb-16">
-            <div className="text-xs font-semibold tracking-wider text-accent-violet uppercase">
-              Pricing
-            </div>
-            <h2 className="text-3xl font-bold tracking-tight text-text-primary">
-              Simple, transparent pricing.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
-            {/* Free */}
-            <div className="bg-card-bg rounded-2xl border border-border-custom p-8 flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 hover:shadow-md">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-semibold text-xl text-text-primary">Free</h3>
-                  <div className="text-4xl font-bold tracking-tight text-text-primary mt-3">
-                    $0<span className="text-sm font-normal text-text-secondary">/mo</span>
-                  </div>
-                </div>
-                <ul className="space-y-3.5 list-none p-0 text-sm text-text-secondary">
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    10GB storage
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Basic AI sorting
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    5 workspaces
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Standard search
-                  </li>
-                </ul>
-              </div>
-              <Link
-                href="/dashboard"
-                className="w-full inline-flex items-center justify-center bg-transparent hover:bg-bg-surface border border-border-custom hover:border-text-secondary text-text-primary text-sm font-semibold py-3 rounded-full mt-8 transition-colors"
-              >
-                Get Started
-              </Link>
-            </div>
-
-            {/* Pro - Featured with Shimmer */}
-            <div className="bg-card-bg rounded-2xl border-2 border-transparent relative flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 hover:shadow-2xl scale-100 md:scale-[1.03] overflow-hidden"
-              style={{
-                borderImage: "linear-gradient(135deg, var(--accent-blue), var(--accent-violet)) 1",
-                borderRadius: "16px"
-              }}
-            >
-              {/* Custom border rounding patch for CSS border-image */}
-              <div className="absolute inset-0 border-[2px] border-accent-blue/30 rounded-2xl pointer-events-none" />
-              <div className="absolute top-0 right-6 bg-gradient-to-r from-accent-blue to-accent-violet text-white text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-b-lg shadow-sm">
-                Most Popular
-              </div>
-
-              <div className="p-8 space-y-6">
-                <div>
-                  <h3 className="font-semibold text-xl text-text-primary">Pro</h3>
-                  <div className="text-4xl font-bold tracking-tight text-text-primary mt-3">
-                    $12<span className="text-sm font-normal text-text-secondary">/mo</span>
-                  </div>
-                </div>
-                <ul className="space-y-3.5 list-none p-0 text-sm text-text-secondary">
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Unlimited storage
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    AI classification
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Semantic search
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Duplicate detection
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Priority support
-                  </li>
-                </ul>
-              </div>
-              <div className="px-8 pb-8">
-                <Link
-                  href="/dashboard"
-                  className="w-full inline-flex items-center justify-center bg-accent-blue hover:bg-accent-blue/90 text-white text-sm font-semibold py-3 rounded-full transition-colors shadow-lg shadow-accent-blue/15"
-                >
-                  Get Started
-                </Link>
-              </div>
-            </div>
-
-            {/* Team */}
-            <div className="bg-card-bg rounded-2xl border border-border-custom p-8 flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 hover:shadow-md">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-semibold text-xl text-text-primary">Team</h3>
-                  <div className="text-4xl font-bold tracking-tight text-text-primary mt-3">
-                    $29<span className="text-sm font-normal text-text-secondary">/mo per seat</span>
-                  </div>
-                </div>
-                <ul className="space-y-3.5 list-none p-0 text-sm text-text-secondary">
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Everything in Pro
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    RBAC & permissions
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Audit logs
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Shared workspaces
-                  </li>
-                  <li className="flex gap-2.5 items-center">
-                    <Check className="w-4.5 h-4.5 text-[#22C55E]" />
-                    Webhooks & API
-                  </li>
-                </ul>
-              </div>
-              <button
-                className="w-full inline-flex items-center justify-center bg-transparent hover:bg-bg-surface border border-border-custom hover:border-text-secondary text-text-primary text-sm font-semibold py-3 rounded-full mt-8 transition-colors"
-              >
-                Contact Sales
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Testimonials */}
       <section id="testimonials" className="py-24 px-6 relative z-10 border-t border-border-custom">
@@ -907,7 +737,7 @@ export default function Home() {
             <h4 className="text-sm font-semibold text-white tracking-wide uppercase">Product</h4>
             <ul className="space-y-2.5 list-none p-0 text-sm text-[#6B6B8A]">
               <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+
               <li><a href="#" className="hover:text-white transition-colors">Changelog</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Roadmap</a></li>
             </ul>

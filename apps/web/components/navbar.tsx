@@ -24,7 +24,7 @@ export function NavBar() {
     { name: "Home", href: isHome ? "#hero" : "/" },
     { name: "Features", href: isHome ? "#features" : "/#features" },
     { name: "How It Works", href: isHome ? "#how-it-works" : "/#how-it-works" },
-    { name: "Pricing", href: isHome ? "#pricing" : "/#pricing" },
+
     { name: "Testimonials", href: isHome ? "#testimonials" : "/#testimonials" },
   ]
 
