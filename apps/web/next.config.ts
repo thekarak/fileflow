@@ -5,10 +5,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'https://fileflow-whrn.onrender.com/api/:path*',
+        source: "/api/:path*",
+        destination: "https://fileflow-whrn.onrender.com/api/:path*",
       },
-    ]
+    ];
   },
 };
 

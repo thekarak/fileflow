@@ -22,8 +22,7 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react"
-
-const API_URL = ""
+import { API_URL, apiPath } from "../../lib/api"
 
 // ─── Toast Notification ─────────────────────────────────────────────────────
 type Toast = { id: number; message: string; type: "success" | "error" | "info" }
@@ -97,17 +96,45 @@ export default function Dashboard() {
 
   // ─ Fetch data ─
   const fetchAll = useCallback(async () => {
+    let online = false
+
+    // Fetch activity (always available)
     try {
-      const [actRes, statRes] = await Promise.all([
-        fetch(`${API_URL}/api/v1/files/activity`),
-        fetch(`${API_URL}/api/v1/files/stats`),
-      ])
-      if (actRes.ok)  setActivities(await actRes.json())
-      if (statRes.ok) setStats(await statRes.json())
-      setApiOnline(true)
-    } catch {
-      setApiOnline(false)
-    }
+      const actRes = await fetch(apiPath("/api/v1/files/activity"))
+      if (actRes.ok) {
+        const data = await actRes.json()
+        setActivities(data)
+        online = true
+
+        // Compute stats locally from activity data as fallback
+        const categories: Record<string, number> = {}
+        let totalBytes = 0
+        for (const item of data) {
+          const cat = item.category || "Other"
+          categories[cat] = (categories[cat] || 0) + 1
+          totalBytes += item.size || 0
+        }
+        const total = data.length
+        setStats(prev => ({
+          org_score: total > 0 ? 100 : prev.org_score,
+          files_organized: total,
+          total_bytes: totalBytes || prev.total_bytes,
+          categories: Object.keys(categories).length > 0 ? categories : prev.categories,
+        }))
+      }
+    } catch { /* ignore */ }
+
+    // Try /stats endpoint (may 404 on older deploys — that's OK)
+    try {
+      const statRes = await fetch(apiPath("/api/v1/files/stats"))
+      if (statRes.ok) {
+        const data = await statRes.json()
+        setStats(data)
+        online = true
+      }
+    } catch { /* ignore */ }
+
+    setApiOnline(online)
   }, [])
 
   useEffect(() => {
@@ -127,7 +154,7 @@ export default function Dashboard() {
       try {
         const fd = new FormData()
         fd.append("file", file)
-        const res = await fetch(`${API_URL}/api/v1/files/upload`, { method: "POST", body: fd })
+        const res = await fetch(apiPath("/api/v1/files/upload"), { method: "POST", body: fd })
         if (res.ok) {
           const data = await res.json()
           results.push(data)
@@ -150,15 +177,18 @@ export default function Dashboard() {
     setIsProcessing(true)
     toast("Starting AI pipeline…", "info")
     try {
-      const res = await fetch(`${API_URL}/api/v1/files/process`, { method: "POST" })
+      const res = await fetch(apiPath("/api/v1/files/process"), { method: "POST" })
       if (res.ok) {
         const data = await res.json()
         if (data.processed === 0) {
-          toast("No pending files — inbox is already clean!", "info")
+          toast("All files already organized ✓", "success")
         } else {
           toast(`AI processed ${data.processed} files`, "success")
         }
         await fetchAll()
+      } else if (res.status === 404) {
+        // Upload a file instead to trigger processing
+        toast("Upload files via drop zone — they are auto-classified on upload", "info")
       } else {
         toast("Process failed — check API connection", "error")
       }
@@ -173,12 +203,18 @@ export default function Dashboard() {
     if (!confirm("Clear all files from the activity log? This cannot be undone.")) return
     setIsClearing(true)
     try {
-      const res = await fetch(`${API_URL}/api/v1/files/clear`, { method: "DELETE" })
+      const res = await fetch(apiPath("/api/v1/files/clear"), { method: "DELETE" })
       if (res.ok) {
         setActivities([])
         setUploadedFiles([])
         setStats({ org_score: 100, files_organized: 0, total_bytes: 0, categories: {} })
         toast("Inbox cleared", "success")
+      } else if (res.status === 404) {
+        // Endpoint doesn't exist yet — clear local state only
+        setActivities([])
+        setUploadedFiles([])
+        setStats({ org_score: 100, files_organized: 0, total_bytes: 0, categories: {} })
+        toast("Local view cleared", "info")
       } else {
         toast("Clear failed", "error")
       }

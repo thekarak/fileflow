@@ -1,9 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { TrendingUp, Activity, Database, FileText, Image as ImageIcon, FileCode, Archive } from "lucide-react"
+import { TrendingUp, Activity, Database, FileText } from "lucide-react"
+import { apiPath } from "../../../lib/api"
 
-const API_URL = ""
+type Stats = {
+  org_score: number
+  files_organized: number
+  total_bytes: number
+  categories: Record<string, number>
+}
 
 const CATEGORY_COLORS: Record<string, string> = {
   documents: "bg-blue-500",
@@ -16,17 +22,45 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 export default function AnalyticsPage() {
-  const [stats, setStats] = useState<any>(null)
+  const [stats, setStats] = useState<Stats | null>(null)
 
   useEffect(() => {
-    fetch(`${API_URL}/api/v1/files/stats`)
-      .then(r => r.json())
-      .then(setStats)
-      .catch(() => {})
+    const fetchData = async () => {
+      // Try /stats first
+      try {
+        const res = await fetch(apiPath("/api/v1/files/stats"))
+        if (res.ok) {
+          setStats(await res.json())
+          return
+        }
+      } catch {}
+
+      // Fallback: compute from /activity
+      try {
+        const res = await fetch(apiPath("/api/v1/files/activity"))
+        if (res.ok) {
+          const data = await res.json()
+          const categories: Record<string, number> = {}
+          let totalBytes = 0
+          for (const item of data) {
+            const cat = (item.category || "Other") as string
+            categories[cat] = (categories[cat] || 0) + 1
+            totalBytes += item.size || 0
+          }
+          setStats({
+            org_score: data.length > 0 ? 100 : 0,
+            files_organized: data.length,
+            total_bytes: totalBytes,
+            categories,
+          })
+        }
+      } catch {}
+    }
+    fetchData()
   }, [])
 
   const categories = stats?.categories || {}
-  const total = Object.values(categories).reduce((a: any, b: any) => a + b, 0) as number
+  const total = Object.values(categories).reduce((a, b) => a + b, 0)
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-12">
@@ -58,7 +92,7 @@ export default function AnalyticsPage() {
         <div className="bg-glass-bg border border-border-custom rounded-2xl p-6">
           <h2 className="text-sm font-semibold text-text-primary mb-6">File Categories</h2>
           <div className="space-y-4">
-            {Object.entries(categories).map(([cat, count]: any) => (
+            {Object.entries(categories).map(([cat, count]) => (
               <div key={cat} className="space-y-1.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-text-primary capitalize font-medium">{cat}</span>

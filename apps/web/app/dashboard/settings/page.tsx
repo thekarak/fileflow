@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { Settings, User, Key, Bell, Shield, Palette, ChevronRight, Check } from "lucide-react"
-
-const API_URL = ""
+import { API_URL } from "../../../lib/api"
 
 export default function SettingsPage() {
   const [apiUrl, setApiUrl] = useState(API_URL)

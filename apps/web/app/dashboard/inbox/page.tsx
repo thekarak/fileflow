@@ -1,19 +1,24 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { UploadCloud, Loader2, CheckCircle2, FileText, Clock } from "lucide-react"
+import { UploadCloud, Loader2, CheckCircle2, Clock } from "lucide-react"
+import { apiPath } from "../../../lib/api"
 
-const API_URL = ""
+type ActivityItem = {
+  file: string
+  action: string
+  time: string
+}
 
 export default function InboxPage() {
-  const [activities, setActivities] = useState<any[]>([])
+  const [activities, setActivities] = useState<ActivityItem[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fetchActivities = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/files/activity`)
+      const res = await fetch(apiPath("/api/v1/files/activity"))
       if (res.ok) setActivities(await res.json())
     } catch {}
   }
@@ -26,7 +31,7 @@ export default function InboxPage() {
       const fd = new FormData()
       fd.append("file", file)
       try {
-        await fetch(`${API_URL}/api/v1/files/upload`, { method: "POST", body: fd })
+        await fetch(apiPath("/api/v1/files/upload"), { method: "POST", body: fd })
       } catch {}
     }
     setIsUploading(false)
