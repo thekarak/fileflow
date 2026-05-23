@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { TrendingUp, Activity, Database, FileText, Image as ImageIcon, FileCode, Archive } from "lucide-react"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+const API_URL = ""
 
 const CATEGORY_COLORS: Record<string, string> = {
   documents: "bg-blue-500",

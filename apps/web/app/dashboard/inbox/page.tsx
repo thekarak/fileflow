@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import { UploadCloud, Loader2, CheckCircle2, FileText, Clock } from "lucide-react"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+const API_URL = ""
 
 export default function InboxPage() {
   const [activities, setActivities] = useState<any[]>([])
