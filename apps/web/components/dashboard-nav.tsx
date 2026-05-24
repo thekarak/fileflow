@@ -55,11 +55,15 @@ export function DashboardNav() {
     }, 1500)
   }
 
-  const notifications = [
+  const [notifications, setNotifications] = useState([
     { id: 1, text: "3 files classified as Documents", time: "2m ago", read: false },
     { id: 2, text: "Duplicate cluster detected (4 files)", time: "15m ago", read: false },
-    { id: 3, text: "Auto-organize completed for inbox", time: "1h ago", read: true },
-  ]
+    { id: 3, text: "Project Alpha workspace created", time: "1h ago", read: true },
+  ])
+
+  const handleMarkAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -139,7 +143,7 @@ export function DashboardNav() {
               <div className="absolute right-0 top-full mt-2 w-80 bg-bg-surface border border-border-custom rounded-2xl shadow-2xl overflow-hidden z-50">
                 <div className="px-4 py-3 border-b border-border-custom flex justify-between items-center">
                   <span className="text-sm font-semibold text-text-primary">Notifications</span>
-                  <span className="text-[10px] text-accent-blue font-medium cursor-pointer hover:underline">Mark all read</span>
+                  <span onClick={handleMarkAllRead} className="text-[10px] text-accent-blue font-medium cursor-pointer hover:underline">Mark all read</span>
                 </div>
                 <div className="max-h-64 overflow-y-auto divide-y divide-border-custom">
                   {notifications.map(n => (

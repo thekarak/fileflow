@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { UploadCloud, Loader2, CheckCircle2, Clock } from "lucide-react"
+import { CheckCircle2, Clock } from "lucide-react"
 import { apiPath } from "../../../lib/api"
+import { BatchOrganizer } from "../../../components/batch-organizer"
 
 type ActivityItem = {
   file: string
@@ -45,23 +46,8 @@ export default function InboxPage() {
         <p className="text-sm text-text-secondary mt-1">Everything you drop here gets classified by AI automatically.</p>
       </div>
 
-      <div
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={(e) => { e.preventDefault(); setIsDragging(false); e.dataTransfer.files?.length && handleUpload(e.dataTransfer.files) }}
-        onClick={() => fileInputRef.current?.click()}
-        className={`rounded-3xl p-16 border-2 border-dashed flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-500
-          ${isDragging ? "border-accent-blue bg-accent-blue/5 shadow-[0_0_40px_rgba(74,140,255,0.2)]" : "border-border-custom hover:border-accent-blue/40 bg-card-bg/40"}
-        `}
-      >
-        <input type="file" className="hidden" ref={fileInputRef} multiple onChange={(e) => e.target.files && handleUpload(e.target.files)} />
-        <div className="w-20 h-20 rounded-full bg-accent-blue/10 text-accent-blue flex items-center justify-center mb-6">
-          {isUploading ? <Loader2 className="w-10 h-10 animate-spin" /> : <UploadCloud className="w-10 h-10" />}
-        </div>
-        <h3 className="text-2xl font-bold text-text-primary mb-2">
-          {isUploading ? "Classifying with AI…" : "Drop files here"}
-        </h3>
-        <p className="text-text-secondary text-sm">Or click to browse. Supports PDFs, images, code, archives and more.</p>
+      <div className="py-4">
+        <BatchOrganizer onUpload={handleUpload} />
       </div>
 
       {activities.length > 0 && (
