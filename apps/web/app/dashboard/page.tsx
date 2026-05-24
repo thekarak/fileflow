@@ -111,7 +111,12 @@ export default function Dashboard() {
         const categories: Record<string, number> = {}
         let totalBytes = 0
         for (const item of data) {
-          const cat = item.category || "Other"
+          // Parse category from action string (e.g. "moved to Documents / Auto-Organized")
+          let cat = item.category
+          if (!cat && item.action && item.action.includes("moved to")) {
+            cat = item.action.split("moved to ")[1].split(" /")[0].trim()
+          }
+          cat = cat || "Other"
           categories[cat] = (categories[cat] || 0) + 1
           totalBytes += item.size || 0
         }
