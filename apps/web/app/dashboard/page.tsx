@@ -23,6 +23,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { API_URL, apiPath } from "../../lib/api"
+import { BatchOrganizer } from "../../components/batch-organizer"
 
 // ─── Toast Notification ─────────────────────────────────────────────────────
 type Toast = { id: number; message: string; type: "success" | "error" | "info" }
@@ -377,46 +378,9 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Mood Ring Drop Zone */}
-          <div
-            onDragOver={onDragOver}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={onDrop}
-            onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={`rounded-3xl p-10 border-2 border-dashed flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-500 group min-h-[260px] ${moodBorderClass}`}
-          >
-            <input
-              type="file"
-              className="hidden"
-              ref={fileInputRef}
-              multiple
-              onChange={(e) => e.target.files?.length && handleUpload(e.target.files)}
-            />
-
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 transition-all duration-500 group-hover:scale-110
-              ${isDragging && dragMood === "images"  ? "bg-amber-400/20 text-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.3)]"  : ""}
-              ${isDragging && dragMood === "mixed"   ? "bg-accent-violet/20 text-accent-violet shadow-[0_0_30px_rgba(139,92,246,0.3)]" : ""}
-              ${(!isDragging || dragMood === "docs") ? "bg-accent-blue/10 text-accent-blue group-hover:shadow-[0_0_25px_rgba(74,140,255,0.2)]" : ""}
-            `}>
-              {isUploading
-                ? <Loader2 className="w-9 h-9 animate-spin" />
-                : <UploadCloud className="w-9 h-9" />
-              }
-            </div>
-
-            <h3 className="text-xl font-bold text-text-primary mb-2">
-              {isUploading ? "AI is classifying…" : "Drop your files here"}
-            </h3>
-            <p className="text-sm text-text-secondary max-w-sm mx-auto leading-relaxed">{moodLabel}</p>
-
-            {!isUploading && (
-              <div className="mt-6 flex gap-2">
-                <span className="px-3 py-1.5 rounded-lg bg-bg-primary border border-border-custom text-xs text-text-secondary">PDFs</span>
-                <span className="px-3 py-1.5 rounded-lg bg-bg-primary border border-border-custom text-xs text-text-secondary">Images</span>
-                <span className="px-3 py-1.5 rounded-lg bg-bg-primary border border-border-custom text-xs text-text-secondary">Code</span>
-                <span className="px-3 py-1.5 rounded-lg bg-bg-primary border border-border-custom text-xs text-text-secondary">Archives</span>
-              </div>
-            )}
+          {/* Batch Organizer Drop Zone */}
+          <div className="py-2">
+            <BatchOrganizer onUpload={handleUpload} />
           </div>
 
           {/* Just Uploaded — live results */}
