@@ -78,12 +78,10 @@ export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isClearing, setIsClearing]   = useState(false)
   const [dragMood, setDragMood] = useState("docs")
   const [toasts, setToasts] = useState<Toast[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([])
   const [apiOnline, setApiOnline] = useState<boolean | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const toastIdRef = useRef(0)
 
   // ─ Toast helper ─
@@ -205,29 +203,15 @@ export default function Dashboard() {
   }
 
   // ─ Clear Inbox ─
-  const handleClearInbox = async () => {
+  const handleClearInbox = () => {
     if (!confirm("Clear all files from the activity log? This cannot be undone.")) return
-    setIsClearing(true)
-    try {
-      const res = await fetch(apiPath("/api/v1/files/clear"), { method: "DELETE" })
-      if (res.ok) {
-        setActivities([])
-        setUploadedFiles([])
-        setStats({ org_score: 100, files_organized: 0, total_bytes: 0, categories: {} })
-        toast("Inbox cleared", "success")
-      } else if (res.status === 404) {
-        // Endpoint doesn't exist yet — clear local state only
-        setActivities([])
-        setUploadedFiles([])
-        setStats({ org_score: 100, files_organized: 0, total_bytes: 0, categories: {} })
-        toast("Local view cleared", "info")
-      } else {
-        toast("Clear failed", "error")
-      }
-    } catch {
-      toast("Cannot reach API server", "error")
-    }
-    setIsClearing(false)
+    // Always clear local state immediately — no API dependency
+    setActivities([])
+    setUploadedFiles([])
+    setStats({ org_score: 100, files_organized: 0, total_bytes: 0, categories: {} })
+    toast("Inbox cleared ✓", "success")
+    // Also try to clear on the server (non-blocking, best-effort)
+    fetch(apiPath("/api/v1/files/clear"), { method: "DELETE" }).catch(() => {})
   }
 
   // ─ Drag handlers ─
@@ -375,10 +359,9 @@ export default function Dashboard() {
             <h2 className="text-base font-semibold text-text-primary">Smart Inbox — Drop Zone</h2>
             <button
               onClick={handleClearInbox}
-              disabled={isClearing}
-              className="text-xs font-medium text-red-400 hover:text-red-500 flex items-center gap-1 disabled:opacity-50"
+              className="text-xs font-medium text-red-400 hover:text-red-500 flex items-center gap-1 transition-colors"
             >
-              {isClearing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+              <Trash2 className="w-3 h-3" />
               Clear All
             </button>
           </div>
@@ -436,12 +419,19 @@ export default function Dashboard() {
                     <h4 className="text-sm font-semibold text-text-primary">Inbox is empty</h4>
                     <p className="text-xs text-text-secondary mt-1">Drop a file in the zone to get started.</p>
                   </div>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2 bg-accent-blue text-white text-xs font-semibold rounded-lg hover:bg-accent-blue/90 transition-colors"
+                  <label
+                    htmlFor="empty-state-upload"
+                    className="px-4 py-2 bg-accent-blue text-white text-xs font-semibold rounded-lg hover:bg-accent-blue/90 transition-colors cursor-pointer"
                   >
                     Upload first file
-                  </button>
+                    <input
+                      id="empty-state-upload"
+                      type="file"
+                      className="hidden"
+                      multiple
+                      onChange={(e) => e.target.files?.length && handleUpload(e.target.files)}
+                    />
+                  </label>
                 </div>
               ) : (
                 activities.map((a, i) => (
