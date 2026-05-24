@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { CheckCircle2, Clock } from "lucide-react"
+import { CheckCircle2, Clock, Trash2 } from "lucide-react"
 import { apiPath } from "../../../lib/api"
 import { BatchOrganizer } from "../../../components/batch-organizer"
 
@@ -9,6 +9,8 @@ type ActivityItem = {
   file: string
   action: string
   time: string
+  size?: number
+  size_bytes?: number
 }
 
 export default function InboxPage() {
@@ -20,15 +22,40 @@ export default function InboxPage() {
   const fetchActivities = async () => {
     try {
       const res = await fetch(apiPath("/api/v1/files/activity"))
-      if (res.ok) setActivities(await res.json())
+      if (res.ok) {
+        const data = await res.json()
+        
+        let clearedSignatures: string[] = []
+        try {
+          clearedSignatures = JSON.parse(localStorage.getItem("fileflow_cleared_signatures") || "[]")
+        } catch {}
+
+        const filtered = data.filter((item: any) => {
+          const sig = `${item.file}::${item.action}::${item.size || item.size_bytes || 0}`
+          return !clearedSignatures.includes(sig)
+        })
+        setActivities(filtered)
+      }
     } catch {}
   }
 
   useEffect(() => { fetchActivities() }, [])
 
   const handleUpload = async (files: FileList) => {
+    const arr = Array.from(files)
+    
+    // Remove these uploaded filenames from cleared signatures in localStorage
+    try {
+      const existing: string[] = JSON.parse(localStorage.getItem("fileflow_cleared_signatures") || "[]")
+      const updated = existing.filter(sig => {
+        const filename = sig.split("::")[0]
+        return !arr.some(f => f.name === filename)
+      })
+      localStorage.setItem("fileflow_cleared_signatures", JSON.stringify(updated))
+    } catch {}
+
     setIsUploading(true)
-    for (const file of Array.from(files)) {
+    for (const file of arr) {
       const fd = new FormData()
       fd.append("file", file)
       try {
@@ -52,8 +79,24 @@ export default function InboxPage() {
 
       {activities.length > 0 && (
         <div className="bg-bg-surface border border-border-custom rounded-2xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-border-custom bg-bg-primary/40">
+          <div className="px-4 py-3 border-b border-border-custom bg-bg-primary/40 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-text-primary">Processed Files</h2>
+            <button
+              onClick={() => {
+                if (!confirm("Clear all files from the activity log? This cannot be undone.")) return
+                try {
+                  const sigs = activities.map(item => `${item.file}::${item.action}::${item.size || item.size_bytes || 0}`)
+                  const existing = JSON.parse(localStorage.getItem("fileflow_cleared_signatures") || "[]")
+                  const updated = Array.from(new Set([...existing, ...sigs]))
+                  localStorage.setItem("fileflow_cleared_signatures", JSON.stringify(updated))
+                } catch {}
+                setActivities([])
+                fetch(apiPath("/api/v1/files/clear"), { method: "DELETE" }).catch(() => {})
+              }}
+              className="text-xs font-medium text-red-400 hover:text-red-500 flex items-center gap-1 transition-colors"
+            >
+              <Trash2 className="w-3 h-3" /> Clear All
+            </button>
           </div>
           <div className="divide-y divide-border-custom max-h-96 overflow-y-auto">
             {activities.map((a, i) => (

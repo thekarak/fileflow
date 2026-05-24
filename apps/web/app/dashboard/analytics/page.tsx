@@ -26,23 +26,36 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Try /stats first
+      let clearedSignatures: string[] = []
       try {
-        const res = await fetch(apiPath("/api/v1/files/stats"))
-        if (res.ok) {
-          setStats(await res.json())
-          return
-        }
+        clearedSignatures = JSON.parse(localStorage.getItem("fileflow_cleared_signatures") || "[]")
       } catch {}
+
+      // Try /stats first (only if no files have been locally cleared, otherwise we must fallback to activity computing)
+      if (clearedSignatures.length === 0) {
+        try {
+          const res = await fetch(apiPath("/api/v1/files/stats"))
+          if (res.ok) {
+            setStats(await res.json())
+            return
+          }
+        } catch {}
+      }
 
       // Fallback: compute from /activity
       try {
         const res = await fetch(apiPath("/api/v1/files/activity"))
         if (res.ok) {
           const data = await res.json()
+          
+          const filtered = data.filter((item: any) => {
+            const sig = `${item.file}::${item.action}::${item.size || item.size_bytes || 0}`
+            return !clearedSignatures.includes(sig)
+          })
+
           const categories: Record<string, number> = {}
           let totalBytes = 0
-          for (const item of data) {
+          for (const item of filtered) {
             let cat = item.category
             if (!cat && item.action && item.action.includes("moved to")) {
               cat = item.action.split("moved to ")[1].split(" /")[0].trim()
@@ -52,8 +65,8 @@ export default function AnalyticsPage() {
             totalBytes += item.size || 0
           }
           setStats({
-            org_score: data.length > 0 ? 100 : 0,
-            files_organized: data.length,
+            org_score: filtered.length > 0 ? 100 : 0,
+            files_organized: filtered.length,
             total_bytes: totalBytes,
             categories,
           })

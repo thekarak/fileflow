@@ -97,18 +97,31 @@ export default function Dashboard() {
   const fetchAll = useCallback(async () => {
     let online = false
 
+    // Load locally cleared signatures to filter activity
+    let clearedSignatures: string[] = []
+    try {
+      clearedSignatures = JSON.parse(localStorage.getItem("fileflow_cleared_signatures") || "[]")
+    } catch {}
+
     // Fetch activity (always available)
     try {
       const actRes = await fetch(apiPath("/api/v1/files/activity"))
       if (actRes.ok) {
         const data = await actRes.json()
-        setActivities(data)
         online = true
+
+        // Filter out cleared activities
+        const filteredData = data.filter((item: any) => {
+          const sig = `${item.file}::${item.action}::${item.size || item.size_bytes || 0}`
+          return !clearedSignatures.includes(sig)
+        })
+
+        setActivities(filteredData)
 
         // Compute stats locally from activity data as fallback
         const categories: Record<string, number> = {}
         let totalBytes = 0
-        for (const item of data) {
+        for (const item of filteredData) {
           // Parse category from action string (e.g. "moved to Documents / Auto-Organized")
           let cat = item.category
           if (!cat && item.action && item.action.includes("moved to")) {
@@ -118,7 +131,7 @@ export default function Dashboard() {
           categories[cat] = (categories[cat] || 0) + 1
           totalBytes += item.size || 0
         }
-        const total = data.length
+        const total = filteredData.length
         setStats(prev => ({
           org_score: total > 0 ? 100 : prev.org_score,
           files_organized: total,
@@ -128,15 +141,17 @@ export default function Dashboard() {
       }
     } catch { /* ignore */ }
 
-    // Try /stats endpoint (may 404 on older deploys — that's OK)
-    try {
-      const statRes = await fetch(apiPath("/api/v1/files/stats"))
-      if (statRes.ok) {
-        const data = await statRes.json()
-        setStats(data)
-        online = true
-      }
-    } catch { /* ignore */ }
+    // Try /stats endpoint (may 404 on older deploys — only try if there are no locally cleared items to avoid overwriting)
+    if (clearedSignatures.length === 0) {
+      try {
+        const statRes = await fetch(apiPath("/api/v1/files/stats"))
+        if (statRes.ok) {
+          const data = await statRes.json()
+          setStats(data)
+          online = true
+        }
+      } catch { /* ignore */ }
+    }
 
     setApiOnline(online)
   }, [])
@@ -150,6 +165,17 @@ export default function Dashboard() {
   // ─ Upload ─
   const handleUpload = async (files: FileList | File[]) => {
     const arr = Array.from(files)
+
+    // Remove these uploaded filenames from cleared signatures in localStorage
+    try {
+      const existing: string[] = JSON.parse(localStorage.getItem("fileflow_cleared_signatures") || "[]")
+      const updated = existing.filter(sig => {
+        const filename = sig.split("::")[0]
+        return !arr.some(f => f.name === filename)
+      })
+      localStorage.setItem("fileflow_cleared_signatures", JSON.stringify(updated))
+    } catch {}
+
     setIsUploading(true)
     const results: any[] = []
 
@@ -205,6 +231,15 @@ export default function Dashboard() {
   // ─ Clear Inbox ─
   const handleClearInbox = () => {
     if (!confirm("Clear all files from the activity log? This cannot be undone.")) return
+
+    // Store signatures in localStorage to persist clearing even if backend DELETE /clear fails or is slow
+    try {
+      const sigs = activities.map(item => `${item.file}::${item.action}::${item.size || item.size_bytes || 0}`)
+      const existing: string[] = JSON.parse(localStorage.getItem("fileflow_cleared_signatures") || "[]")
+      const updated = Array.from(new Set([...existing, ...sigs]))
+      localStorage.setItem("fileflow_cleared_signatures", JSON.stringify(updated))
+    } catch {}
+
     // Always clear local state immediately — no API dependency
     setActivities([])
     setUploadedFiles([])
@@ -403,9 +438,19 @@ export default function Dashboard() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-text-primary">Recent Activity</h2>
-            <button onClick={fetchAll} className="text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-1">
-              <RefreshCw className="w-3 h-3" /> Refresh
-            </button>
+            <div className="flex items-center gap-2">
+              {activities.length > 0 && (
+                <button
+                  onClick={handleClearInbox}
+                  className="text-xs font-medium text-red-400 hover:text-red-500 flex items-center gap-1 transition-colors"
+                >
+                  <Trash2 className="w-3 h-3" /> Clear Now
+                </button>
+              )}
+              <button onClick={fetchAll} className="text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-1">
+                <RefreshCw className="w-3 h-3" /> Refresh
+              </button>
+            </div>
           </div>
 
           <div className="bg-glass-bg border border-border-custom rounded-2xl overflow-hidden flex flex-col" style={{ minHeight: 420 }}>
