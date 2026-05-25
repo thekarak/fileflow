@@ -1,22 +1,23 @@
-FROM python:3.11-slim
+FROM debian:stable-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+    gcc \
+    libc-dev \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy requirements and install python packages
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy C source code
+COPY src/server.c ./src/server.c
 
-# Copy source code
-COPY src/ ./src/
+# Compile the C server with USE_POSTGRES enabled
+RUN gcc src/server.c -o fileflow-server -DUSE_POSTGRES -lpq
 
-# Expose port (Cloud Run overrides this via environment variable PORT)
-EXPOSE 8080
+# Expose port (Render sets PORT env dynamically)
+EXPOSE 8000
 
-# Run uvicorn server
-CMD ["sh", "-c", "uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+# Run the C server executable
+CMD ["./fileflow-server"]

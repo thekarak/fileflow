@@ -18,3 +18,11 @@ redis_data/
 # OS-specific
 .DS_Store
 Thumbs.db
+
+# C Build Files
+*.exe
+*.o
+*.out
+apps/api/database.csv
+database.csv
+uploads/
